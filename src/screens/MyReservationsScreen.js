@@ -1,10 +1,12 @@
 import React, { useEffect, useState } from 'react';
 import { View, Text, FlatList, TouchableOpacity, Alert } from 'react-native';
 import firebase from '../config/firebaseconfig';
+import { useNavigation } from '@react-navigation/native';
 
 const MyReservationsScreen = () => {
   const [myReservations, setMyReservations] = useState([]);
   const userId = firebase.auth().currentUser?.uid;
+  const navigation = useNavigation();
 
   useEffect(() => {
     const fetchMyReservations = async () => {
@@ -28,12 +30,20 @@ const MyReservationsScreen = () => {
   const cancelReservation = async (slotId) => {
     const db = firebase.firestore();
     try {
+      // Atualizando o slot para torná-lo disponível novamente
       await db.collection('slots').doc(slotId).update({
         available: true,
-        reservedBy: null,
+        reservedBy: null, // Removendo o usuário que fez a reserva
       });
+
+      // Remover a reserva localmente
       setMyReservations(myReservations.filter(r => r.id !== slotId));
+
+      // Alerta para o usuário
       Alert.alert('Sucesso', 'Reserva cancelada com sucesso!');
+
+      // Redirecionar para a tela de reservas para que outros possam reservar o horário
+      navigation.navigate('Reservations'); // Ajuste o nome da tela conforme necessário
     } catch (error) {
       Alert.alert('Erro', 'Não foi possível cancelar a reserva.');
       console.error('Erro ao cancelar:', error);

@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, FlatList, ActivityIndicator } from 'react-native';
+import { View, StyleSheet, ScrollView } from 'react-native';
+import { ActivityIndicator, Card, Text, Title, Paragraph } from 'react-native-paper';
 import firebase from '../config/firebaseconfig';
 
 const BarberReservationsScreen = () => {
@@ -34,41 +35,70 @@ const BarberReservationsScreen = () => {
 
   if (loading) {
     return (
-      <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
-        <ActivityIndicator size="large" color="#000" />
+      <View style={styles.centered}>
+        <ActivityIndicator animating size="large" color="#6200ee" />
+        <Text style={{ marginTop: 12 }}>Carregando reservas...</Text>
       </View>
     );
   }
 
   if (reservations.length === 0) {
     return (
-      <View style={{ flex: 1, padding: 20 }}>
-        <Text style={{ fontSize: 18 }}>Nenhuma reserva encontrada.</Text>
+      <View style={styles.centered}>
+        <Text style={styles.noDataText}>Nenhuma reserva encontrada.</Text>
       </View>
     );
   }
 
   return (
-    <View style={{ flex: 1, padding: 20 }}>
-      <Text style={{ fontSize: 24, fontWeight: 'bold', marginBottom: 20 }}>Reservas dos Clientes</Text>
-      <FlatList
-        data={reservations}
-        keyExtractor={item => item.id}
-        renderItem={({ item }) => (
-          <View style={{
-            backgroundColor: '#f1f1f1',
-            padding: 15,
-            borderRadius: 10,
-            marginBottom: 10
-          }}>
-            <Text style={{ fontSize: 16, fontWeight: 'bold' }}>{item.reservedByName || 'Sem nome'}</Text>
-            <Text>Data: {item.date}</Text>
-            <Text>Horário: {item.time}</Text>
-          </View>
-        )}
-      />
-    </View>
+    <ScrollView contentContainerStyle={styles.container}>
+      <Title style={styles.title}>Reservas dos Clientes</Title>
+      {reservations.map(res => (
+        <Card key={res.id} style={styles.card} elevation={3}>
+          <Card.Content>
+            <Title style={styles.clientName}>{res.reservedByName || 'Sem nome'}</Title>
+            <Paragraph>📅 Data: {res.date}</Paragraph>
+            <Paragraph>⏰ Horário: {res.time}</Paragraph>
+          </Card.Content>
+        </Card>
+      ))}
+    </ScrollView>
   );
 };
+
+const styles = StyleSheet.create({
+  container: {
+    flexGrow: 1,
+    padding: 20,
+    backgroundColor: '#fafafa',
+  },
+  title: {
+    fontSize: 24,
+    fontWeight: 'bold',
+    marginBottom: 20,
+    color: '#333',
+    textAlign: 'center',
+  },
+  card: {
+    marginBottom: 12,
+    borderRadius: 16,
+    backgroundColor: '#ffffff',
+  },
+  clientName: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    marginBottom: 4,
+  },
+  noDataText: {
+    fontSize: 18,
+    color: '#666',
+    textAlign: 'center',
+  },
+  centered: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+});
 
 export default BarberReservationsScreen;

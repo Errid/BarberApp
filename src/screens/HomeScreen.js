@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, Button, FlatList, TouchableOpacity, Alert, TextInput, Modal } from 'react-native';
+import { View, Alert, Modal, StyleSheet, FlatList } from 'react-native';
+import { Text, Button, TextInput, Card, Title } from 'react-native-paper';
 import { Calendar } from 'react-native-calendars';
 import firebase from '../config/firebaseconfig';
 import { useNavigation } from '@react-navigation/native';
@@ -58,6 +59,10 @@ const ClientReservationScreen = () => {
         reservedByName: userNameInput.trim(),
       });
 
+      // Atualiza slots disponíveis localmente
+      const updatedSlots = availableSlots.filter(s => s.id !== slot.id);
+      setAvailableSlots(updatedSlots);
+
       Alert.alert('Reserva confirmada', `Você reservou ${selectedTime} em ${selectedDate}`);
       setSelectedTime('');
       setUserNameInput('');
@@ -69,87 +74,86 @@ const ClientReservationScreen = () => {
   };
 
   return (
-    <View style={{ flex: 1, padding: 20 }}>
-      <Text style={{ fontSize: 24, fontWeight: 'bold', marginBottom: 20 }}>Reservar Horário</Text>
+    <View style={styles.container}>
+      <Title style={styles.title}>Horário no Macarra</Title>
 
-      <TouchableOpacity
+      <Button
+        mode="contained"
         onPress={() => navigation.navigate('Reservations')}
-        style={{
-          backgroundColor: '#4CAF50',
-          padding: 12,
-          borderRadius: 8,
-          marginBottom: 15,
-          alignItems: 'center',
-        }}
+        style={styles.viewReservationsButton}
       >
-        <Text style={{ color: 'white', fontWeight: 'bold' }}>Ver Minhas Reservas</Text>
-      </TouchableOpacity>
+        Minhas Reservas
+      </Button>
 
-      {/* Calendário com localidade configurada para Português (BR) */}
+      <Button
+        mode="contained"
+        onPress={() => navigation.navigate('Catalogo')}
+        style={styles.viewReservationsButton}
+      >
+        Catálogo
+      </Button>
+
       <Calendar
         locale={'pt-br'}
         onDayPress={day => setSelectedDate(day.dateString)}
-        markedDates={markedDates}
+        markedDates={{
+          ...markedDates,
+          [selectedDate]: { selected: true, marked: true, selectedColor: '#00adf5' }
+        }}
+        style={styles.calendar}
       />
 
       {selectedDate && (
         <>
-          <Text style={{ fontSize: 18, fontWeight: 'bold', marginVertical: 10 }}>
-            Horários disponíveis para {selectedDate}
-          </Text>
+          <Title style={styles.subtitle}>Horários para {selectedDate}</Title>
           <FlatList
+            horizontal
             data={availableSlots.filter(slot => slot.date === selectedDate)}
             keyExtractor={(item) => item.id}
+            contentContainerStyle={{ paddingVertical: 10 }}
             renderItem={({ item }) => (
-              <TouchableOpacity
-                style={{
-                  padding: 10,
-                  borderRadius: 5,
-                  backgroundColor: selectedTime === item.time ? '#00adf5' : '#eee',
-                  margin: 5,
-                  minWidth: 80,
-                  alignItems: 'center',
-                }}
+              <Card
+                style={[
+                  styles.timeCard,
+                  selectedTime === item.time && styles.selectedTimeCard
+                ]}
                 onPress={() => setSelectedTime(item.time)}
               >
-                <Text>{item.time}</Text>
-              </TouchableOpacity>
+                <Card.Content>
+                  <Text>{item.time}</Text>
+                </Card.Content>
+              </Card>
             )}
           />
-          <Button title="Confirmar Reserva" onPress={handleBooking} />
+          <Button
+            mode="contained"
+            onPress={handleBooking}
+            style={styles.confirmButton}
+            disabled={!selectedTime}
+          >
+            Confirmar Reserva
+          </Button>
         </>
       )}
 
-      {/* Modal para digitar nome */}
+      {/* Modal para nome */}
       <Modal visible={nameModalVisible} transparent animationType="slide">
-        <View style={{
-          flex: 1,
-          justifyContent: 'center',
-          alignItems: 'center',
-          backgroundColor: 'rgba(0,0,0,0.5)'
-        }}>
-          <View style={{
-            backgroundColor: 'white',
-            padding: 20,
-            borderRadius: 10,
-            width: '80%',
-          }}>
-            <Text style={{ fontSize: 18, fontWeight: 'bold', marginBottom: 10 }}>Digite seu nome</Text>
+        <View style={styles.modalOverlay}>
+          <View style={styles.modalContainer}>
+            <Title style={{ marginBottom: 10 }}>Digite seu nome</Title>
             <TextInput
-              placeholder="Seu nome"
+              label="Nome"
               value={userNameInput}
               onChangeText={setUserNameInput}
-              style={{
-                borderWidth: 1,
-                borderColor: '#ccc',
-                borderRadius: 8,
-                padding: 10,
-                marginBottom: 15,
-              }}
+              mode="outlined"
+              style={{ marginBottom: 20 }}
             />
-            <Button title="Confirmar Reserva" onPress={confirmReservation} />
-            <View style={{ height: 10 }} />
-            <Button title="Cancelar" color="red" onPress={() => setNameModalVisible(false)} />
+            <Button mode="contained" onPress={confirmReservation}>
+              Confirmar
+            </Button>
+            <Button mode="text" onPress={() => setNameModalVisible(false)} textColor="red">
+              Cancelar
+            </Button>
           </View>
         </View>
       </Modal>
@@ -158,3 +162,53 @@ const ClientReservationScreen = () => {
 };
 
 export default ClientReservationScreen;
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    padding: 20,
+    backgroundColor: '#fff',
+  },
+  title: {
+    fontSize: 26,
+    marginBottom: 10,
+    textAlign: 'center',
+  },
+  subtitle: {
+    fontSize: 18,
+    marginTop: 20,
+    marginBottom: 10,
+  },
+  viewReservationsButton: {
+    marginBottom: 15,
+  },
+  calendar: {
+    borderRadius: 10,
+    elevation: 2,
+  },
+  timeCard: {
+    marginRight: 10,
+    padding: 10,
+    backgroundColor: '#f2f2f2',
+    borderRadius: 10,
+  },
+  selectedTimeCard: {
+    backgroundColor: '#00adf5',
+  },
+  confirmButton: {
+    marginTop: 20,
+  },
+  modalOverlay: {
+    flex: 1,
+    backgroundColor: 'rgba(0,0,0,0.5)',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  modalContainer: {
+    width: '85%',
+    backgroundColor: 'white',
+    borderRadius: 12,
+    padding: 20,
+    elevation: 5,
+  },
+});
