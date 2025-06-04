@@ -73,9 +73,14 @@ const ClientReservationScreen = () => {
     }
   };
 
+  const formatDateBR = (dateString) => {
+    const [year,month,day] = dateString.split('-');
+    return `${day}/${month}/${year}`;
+  }
+
   return (
     <View style={styles.container}>
-      <Title style={styles.title}>Horário no Macarra</Title>
+      <Title style={styles.title}>Marcar horário</Title>
 
       <Button
         mode="contained"
@@ -105,7 +110,7 @@ const ClientReservationScreen = () => {
 
       {selectedDate && (
         <>
-          <Title style={styles.subtitle}>Horários para {selectedDate}</Title>
+          <Title style={styles.subtitle}>Horários para {formatDateBR(selectedDate)}</Title>
           <FlatList
             horizontal
             data={availableSlots.filter(slot => slot.date === selectedDate)}
@@ -167,36 +172,47 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     padding: 20,
-    backgroundColor: '#fff',
+    backgroundColor: '#FFFFFF',
   },
   title: {
     fontSize: 26,
     marginBottom: 10,
     textAlign: 'center',
+    color: '#000000',
+    fontWeight: 'bold',
   },
   subtitle: {
     fontSize: 18,
     marginTop: 20,
     marginBottom: 10,
+    color: '#333333',
+    fontWeight: '600',
   },
   viewReservationsButton: {
     marginBottom: 15,
+    borderRadius: 8,
+    backgroundColor: '#2196F3',
   },
   calendar: {
     borderRadius: 10,
     elevation: 2,
+    backgroundColor: '#FFFFFF',
   },
   timeCard: {
     marginRight: 10,
     padding: 10,
-    backgroundColor: '#f2f2f2',
+    backgroundColor: '#F5F5F5',
     borderRadius: 10,
+    borderWidth: 1,
+    borderColor: '#E0E0E0',
   },
   selectedTimeCard: {
-    backgroundColor: '#00adf5',
+    backgroundColor: '#2196F3',
   },
   confirmButton: {
     marginTop: 20,
+    borderRadius: 8,
+    backgroundColor: '#2196F3',
   },
   modalOverlay: {
     flex: 1,
@@ -206,9 +222,10 @@ const styles = StyleSheet.create({
   },
   modalContainer: {
     width: '85%',
-    backgroundColor: 'white',
+    backgroundColor: '#FFFFFF',
     borderRadius: 12,
     padding: 20,
     elevation: 5,
   },
 });
+

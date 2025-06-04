@@ -1,15 +1,22 @@
-// src/config/firebaseConfig.js
 import firebase from 'firebase/compat/app';
 import 'firebase/compat/auth';
 import 'firebase/compat/firestore';
+import {
+  API_KEY,
+  AUTH_DOMAIN,
+  PROJECT_ID,
+  STORAGE_BUCKET,
+  MESSAGING_SENDER_ID,
+  APP_ID
+} from '@env';
 
 const firebaseConfig = {
-  apiKey: "AIzaSyAHSBzoX-rsm3_0Fdr2cwsXJm7xnBUWA0Y",
-  authDomain: "barber-app-df059.firebaseapp.com",
-  projectId: "barber-app-df059",
-  storageBucket: "barber-app-df059.appspot.com",
-  messagingSenderId: "355462308678",
-  appId: "1:355462308678:web:d9a6d5c819963296147b47"
+  apiKey: API_KEY,
+  authDomain: AUTH_DOMAIN,
+  projectId: PROJECT_ID,
+  storageBucket: STORAGE_BUCKET,
+  messagingSenderId: MESSAGING_SENDER_ID,
+  appId: APP_ID
 };
 
 if (!firebase.apps.length) {
