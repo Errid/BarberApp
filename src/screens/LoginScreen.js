@@ -36,7 +36,7 @@ const LoginScreen = () => {
 
   return (
     <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : undefined} style={styles.container}>
-      <Text style={styles.title}>Bem-vindo de volta!</Text>
+      <Text style={styles.title}>Aplicativo de barbeiro</Text>
 
       <TextInput
         label="Email"
